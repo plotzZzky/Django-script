@@ -23,7 +23,7 @@ urlpatterns = [
 ]
 '''
 
-class DjangoScript:
+class DjangoForge:
     def __init__(self):
       #### Edit this ####################
 
@@ -96,5 +96,5 @@ class DjangoScript:
                f' pip install -r requirements.txt'
 
 
-app = DjangoScript()
+app = DjangoForge()
 app.wellcome()
