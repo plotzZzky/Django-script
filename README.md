@@ -1,4 +1,4 @@
-<h1 align="center"> Django-script</h1>
+<h1 align="center"> DjangoForge </h1>
 Script para automatizar parte da criação de projetos com o Django
 
 
