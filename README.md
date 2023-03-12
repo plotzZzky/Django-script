@@ -8,7 +8,10 @@ Script para automatizar parte da criação de projetos com o Django
 
 ## Caracteristicas:
 - [x] Cria a pasta com o nome do projeto;
-- [x] Cria o ambiente virtual;
+- [x] Cria uma pasta pro backend;
+- [x] Cria uma pasta pro frontend;
+- [x] Cria um projeto com create-react-app;
+- [x] Cria o ambiente virtual python;
 - [x] Gera o arquivo requirements.txt com as dependencias escolhidas pelo usuario;
 - [x] Instala as dependencias do arquivo requerimentes.txt, incluido as padrôes;
 - [x] Cria o projeto, alguns apps padrões e os demais escolhidos pelo usuario;
