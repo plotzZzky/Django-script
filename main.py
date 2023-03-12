@@ -1,23 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
-
-
-########  Edit!!! ########
-
-TERMINAL = 'xfce4-terminal'
-
-##########################
-
-BASE_DIC = os.getcwd()
-project_name = None
-folder = ""
-
-list_apps = ["users", "core"]
-requirements = ["django", "psycopg2"]
-requirements_text = ""
-apps_commands = ""
-install_all = ""
+import art
 
 urls_system = f'''from django.contrib import admin
 from django.urls import path, include
@@ -29,90 +13,88 @@ urlpatterns = [
     path('users/', include('users.urls')),
 ]'''
 
-urls_core = '''from django.urls import path
+urls_base = '''from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('about/', views.about, name='about'),
+    path('', views, name=''),
 ]
 '''
 
-core_views = '''from django.shortcuts import render
+class DjangoScript:
+    def __init__(self):
+      #### Edit this ####################
+
+        self.terminal = 'xfce4-terminal'
+
+      ###################################
+
+        self.BASE_DIC = os.getcwd()
+        self.project_name = None
+        self.folder = ""
+
+        self.list_apps = ["users", "core"]
+        self.requirements = ["django", "psycopg2"]
+        self.requirements_text = ""
+        self.apps_commands = ""
+        self.install_all = ""
+
+    def wellcome(self):
+        art.tprint(f'{" " * 5} DjangoForge', 'tarty1')
+        print(f"{'-' * 36} https://github.com/plotzZzky {'-' * 36}\n")
+        print("Este script automatiza parte do processo de criação de projetos com django\n")
+        self.get_requirements()
+
+    def get_requirements(self):
+        self.project_name = input('Digite o nome do projeto:\n')
+        self.folder = f"{self.BASE_DIC}/{self.project_name}/"
+        query = input('Digite os requisitos do seu projeto separados por espaços\n')
+        r = query.split()
+        self.requirements.extend(r)
+        self.get_app_list()
+
+    def get_app_list(self):
+        query = input('Digite o nome dos apps para adicionar a seu projeto separados por espaços\n'
+                      'apps padrao: core e users\n')
+        a = query.split()
+        self.list_apps.extend(a)
+        self.create_project_folder()
+
+    def create_project_folder(self):
+        path = Path(self.folder)
+        Path.mkdir(path)
+        self.create_venv()
+
+    def create_venv(self):
+        front_command = f"npx create-react-app front; cd front/src/; mkdir elements/"
+        self.apps_commands = self.create_apps()
+        install_all = self.create_requirements_commands()
+        create_project = f' django-admin startproject system .; touch .gitignore; cd system/;' \
+                         f' echo "{urls_system}" > urls.py; {self.apps_commands}'
+        subprocess.call([f"{self.terminal}", "-x", "sh", "-c", f"cd {self.folder}; {front_command}; cd {self.folder};"
+                        f"mkdir back/; cd back/; {install_all}; {create_project}"])
+
+    def create_apps(self):
+        apps = [self.create_app_commands(x) for x in self.list_apps]
+        return "".join(apps)
+
+    # Gera o comando para criar cada django-app
+    def create_app_commands(self, item):
+        if item == 'users':
+            text = f'cd {self.folder}/back/; django-admin startapp {item}; cd {item}/; echo "{urls_base}" > urls.py;'
+        else:
+            text = f'cd {self.folder}/back/; django-admin startapp {item}; cd {item}/; echo "{urls_base}" > urls.py;'
+        return text
+
+    # gera a lista com as dependências do projeto
+    def create_requirements_commands(self):
+        r = [f"{item}\n" for item in self.requirements]
+        self.requirements_text = "".join(r)
+        return f'python3 -m venv venv; source venv/bin/activate; echo "{self.requirements_text}" > requirements.txt;' \
+               f' pip install -r requirements.txt'
 
 
-def home(request):
-    return render(request, 'home.html')
-
-
-def about(request):
-    return render(request, 'about.html')
-
-'''
-
-def wellcome():
-    print("Bem vindo!!")
-    print("Este script automatiza parte do processo de criação de projetos com django\n")
-    get_requirements()
-
-
-def get_requirements():
-    global folder, project_name
-    project_name = input('Digite o nome do projeto:\n')
-    folder = f"{BASE_DIC}/{project_name}/"
-    query = input('Digite os requisitos do seu projeto separados por espaços\n')
-    r = query.split()
-    requirements.extend(r)
-    get_apps()
-
-
-def get_apps():
-    query = input('Digite o nome dos apps para adicionar a seu projeto separados por espaços\n'
-                  'apps padrao: core e users\n')
-    a = query.split()
-    list_apps.extend(a)
-    create_project_folder()
-
-
-def create_project_folder():
-    path = Path(folder)
-    Path.mkdir(path)
-    create_venv()
-
-
-def create_venv():
-    global apps_commands, install_all
-    apps_commands = create_apps()
-    install_all = create_requirements_commands()
-    create_project = f' django-admin startproject system .; touch .gitignore; cd system/;' \
-                     f' echo "{urls_system}" > urls.py; {apps_commands}'
-    subprocess.call([f"{TERMINAL}", "-x", "sh", "-c", f"cd {folder}; {install_all}; {create_project}"])
-
-
-
-def create_apps():
-    apps = [create_app_commands(x) for x in list_apps]
-    return "".join(apps)
-
-
-def create_app_commands(item):
-    if item == 'users':
-        text = f'cd {folder}; django-admin startapp {item}; cd {item}/; touch urls.py; touch forms.py; ' \
-               f'mkdir templates/; mkdir static/;'
-    else:
-        text = f'cd {folder}; django-admin startapp {item}; cd {item}/; echo "{urls_core}" > urls.py;' \
-               f' echo "{core_views}" > views.py; mkdir templates/; mkdir static/;'
-    return text
-
-
-def create_requirements_commands():
-    global requirements_text
-    r = [f"{item}\n" for item in requirements]
-    requirements_text = "".join(r)
-    return f'python3 -m venv venv; source venv/bin/activate; echo "{requirements_text}" > requirements.txt;' \
-                  f' pip install -r requirements.txt'
-
-
-wellcome()
+app = DjangoScript()
+app.wellcome()
